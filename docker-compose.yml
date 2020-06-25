@@ -1,0 +1,61 @@
+################################################################################
+###  File Transfer - client and server
+#
+# This is a docker-compose file used to build and launch the docker images that
+# composes this solution.
+#
+# Both the ft_server and the ft_client are placed in the same docker image. It
+# is required to run one instance of the server.
+# 
+# The client may be run from the container running the server, by using 
+# docker exec or from a new container instance by using docker run.    
+#
+# Usage:
+#  1. For (re)building all docker images 
+#    docker-compose build
+# 
+#  2. To run the server
+#    docker-compose up ft
+#
+#  3. To run the test clients (where N_INSTANCES is the number of client
+#     instances to run in parallel)
+#    docker-compose up --scale ft_client_test=N_INSTANCES ft_client_test
+#
+#  4. For running client instance
+#     docker run -it ft /ft_client [-d HOST] [-p PORT] [-u UUID] /files/FILE
+#   Example:
+#     docker run -v ${pwd}:/files/:ro -it ft \
+#                /ft_client \
+#                            -d 192.168.35.145 -p 4444 \
+#                            -u e146b4c9-0ec0-4c6a-8bc7-5b9c90e37b1a \
+#                            /files/LICENSE
+#
+#    Important notes: HOST must be the host IP address of where the server
+#    container is being run. File to transfer must be prefixed with the /files/
+#    path since it is the internal directory within the container where the
+#    current dir is being mounted.
+#
+# See README.MD for further details.
+#
+###  # Released under MIT License
+###  Copyright (c) 2020 Hernan Perrone (hernan.perrone@gmail.com)
+################################################################################
+version: "3.8"
+services:
+    ft:
+        build:
+          context: ./
+          dockerfile: Dockerfile
+        ports: 
+        - 4444:4444
+        volumes:
+        - ./recv:/in:rw
+        - ./files:/files:rw
+
+# Image for stress testing the server
+    ft_client_test:
+        build:
+          context: test
+          dockerfile: Dockerfile
+        depends_on:
+        - ft
