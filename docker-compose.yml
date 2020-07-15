@@ -19,7 +19,8 @@
 #
 #  3. To run the test clients (where N_INSTANCES is the number of client
 #     instances to run in parallel)
-#    docker-compose up --scale ft_client_test=N_INSTANCES ft_client_test
+#     docker run -v ${pwd}:/files/:ro -it ft /ft_client \
+#                [-d HOST] [-p PORT] [-u UUID] /files/FILE
 #
 #  4. For running client instance
 #     docker run -it ft /ft_client [-d HOST] [-p PORT] [-u UUID] /files/FILE
